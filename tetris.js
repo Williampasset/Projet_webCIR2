@@ -6,14 +6,10 @@ var ctx = canvas.getContext("2d");
 var blockSize = 30;
 canvas.width = 300; // Largeur du canevas
 canvas.height = 540; // Hauteur du canevas
+
 // Nombre de colonnes et de lignes pour la grille
 var numColumns = canvas.width / blockSize;
 var numRows = canvas.height / blockSize;
-
-console.log(canvas.width);
-console.log(canvas.height);
-console.log(numColumns);
-console.log(numRows);
 
 // Dessiner la grille
 function drawGrid() {
@@ -39,7 +35,6 @@ function drawGrid() {
 // Appel de la fonction pour dessiner la grille
 drawGrid();
 
-
 // Objet Bloc
 function Block(x, y, color) {
     this.x = x; // Position x du bloc
@@ -47,65 +42,57 @@ function Block(x, y, color) {
     this.color = color; // Couleur du bloc
 }
 
-// Exemple d'instanciation d'un bloc
-var myBlock = new Block(3, 5, "red");
-
 // Fonction pour dessiner un bloc sur le canevas
 function drawBlock(block) {
     ctx.fillStyle = block.color; // Définir la couleur de remplissage
     ctx.fillRect(block.x * blockSize, block.y * blockSize, blockSize, blockSize); // Dessiner le bloc
 }
 
-var myBlock = new Block(3, 5, "red");
-drawBlock(myBlock);
+function drawPattern(pattern){
+    for (var y = 0; y < pattern.length; y++) {
+        for (var x = 0; x < pattern[y].length; x++) {
+            if (pattern[y][x] === 1) {
+                drawBlock(new Block(x, y, "blue"));
+            }
+        }
+    }
+}
 
-// Définition des modèles de blocs Tetris
-var blockPatterns = {
-    // Ligne
-    line: [
-        [1, 1, 1, 1]
-    ],
+var patternSelection = ["line", "square", "L", "T", "Z", "S", "J"];
+var currentPattern = patternSelection[Math.floor(Math.random() * patternSelection.length)];
 
-    // Carré
-    square: [
-        [1, 1],
-        [1, 1]
-    ],
+function drawCurrentPattern(){
+    drawPattern(blockPatterns[currentPattern]);
+}
 
-    // L
-    L: [
-        [1, 0],
-        [1, 0],
-        [1, 1]
-    ],
+drawCurrentPattern();
 
-    // T
-    T: [
-        [1, 1, 1],
-        [0, 1, 0]
-    ],
+function clearCanvas(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawGrid();
+}
+function clearPattern(){
+    for (var y = 0; y < blockPatterns[currentPattern].length; y++) {
+        for (var x = 0; x < blockPatterns[currentPattern][y].length; x++) {
+            if (blockPatterns[currentPattern][y][x] === 1) {
+                drawBlock(new Block(x, y, "white"));
+            }
+        }
+    }
+}
+function fallBlock(block){
+    block.y++;
+    drawBlock(block);
+}
 
-    // Z
-    Z: [
-        [1, 1, 0],
-        [0, 1, 1]
-    ],
+function fallPattern(pattern){
+    for (var y = 0; y < pattern.length; y++) {
+        for (var x = 0; x < pattern[y].length; x++) {
+            if (pattern[y][x] === 1) {
+                fallBlock(new Block(x, y, "blue"));
+            }
+        }
+    }
+}
 
-    // S
-    S: [
-        [0, 1, 1],
-        [1, 1, 0]
-    ],
-
-    // J
-    J: [
-        [0, 1],
-        [0, 1],
-        [1, 1]
-    ]
-};
-
-// Exemple d'utilisation d'un modèle de bloc (ligne)
-var linePattern = blockPatterns.line;
-
-
+fallPattern(blockPatterns[currentPattern]);
