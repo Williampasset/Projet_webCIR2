@@ -1,0 +1,14 @@
+{
+  "name": "projet_webcir2",
+  "version": "1.0.0",
+  "description": "Tetris ",
+  "main": "blockPattern.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Bilel Taieb et William Passet",
+  "license": "ISC",
+  "dependencies": {
+    "phaser": "^3.80.1"
+  }
+}

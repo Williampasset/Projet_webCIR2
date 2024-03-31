@@ -71,6 +71,7 @@ function clearCanvas(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawGrid();
 }
+
 function clearPattern(){
     for (var y = 0; y < blockPatterns[currentPattern].length; y++) {
         for (var x = 0; x < blockPatterns[currentPattern][y].length; x++) {
