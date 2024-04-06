@@ -4,12 +4,14 @@
   "description": "Tetris ",
   "main": "tetris.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon tetris.js"
   },
   "author": "Bilel Taieb et William Passet",
   "license": "ISC",
   "dependencies": {
     "express": "^4.19.2",
+    "nodemon": "^3.1.0",
     "phaser": "^3.80.1"
   }
 }
