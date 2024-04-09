@@ -72,6 +72,8 @@ function update() {
     if(cursors.down.isDown){
         fallBlocks(this);
     }
+    // Vérifier si une ligne est pleine
+    removeFullLines(mapData);
 }
 
 ///////////////////////////////////////////
@@ -105,14 +107,6 @@ function generateRandomBlock() {
         Z: [[1, 1, 0], [0, 1, 1]],
         S: [[0, 1, 1], [1, 1, 0]],
         J: [[0, 1], [0, 1], [1, 1]]
-    };
-    const blockRotationPoints = {
-        line: { x: 1, y: 0},
-        L: { x: 1, y: 1 },
-        T: { x: 1, y: 0 },
-        Z: { x: 1, y: 0 },
-        S: { x: 1, y: 1 },
-        J: { x: 1, y: 1 },
     };
     return {
         type: randomBlockType,
@@ -262,6 +256,7 @@ function moveBlockRight() {
 
 // Fonction de rotation du bloc
 function rotateBlock() {
+    
     const rotatedPattern = [];
     // Transposer la matrice du bloc
     for (let x = 0; x < activeBlock.pattern[0].length; x++) {
@@ -300,4 +295,29 @@ function canRotateBlock(block, mapData, rotatedPattern) {
         }
     }
     return true; // Rotation autorisée
+}
+
+// Fonction pour vérifier si une ligne est pleine
+function isLineFull(line) {
+    for (let i = 1; i < 9; i++) {
+        if (line[i] !== 3) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// Fonction pour supprimer une ligne pleine
+function removeFullLines(mapData) {
+    for (let y = 0; y < mapData.length; y++) {
+        if (isLineFull(mapData[y])) {
+            // Supprimer la ligne pleine
+            mapData.splice(y, 1);
+            // Ajouter une nouvelle ligne vide au début de la carte
+            tab = new Array(10).fill(0);
+            tab[0] = 1;
+            tab[9] = 1;
+            mapData.unshift(tab);
+        }
+    }
 }
