@@ -21,7 +21,46 @@ let mapData;
 let activeBlock;
 let timer;
 let FALL_DELAY = 1000; // Délai entre les chutes automatiques des blocs (en millisecondes)
+let start = false;
+let nextBlock = generateRandomBlock();
 //0: vide, 1: bloc de pierre, 2: bloc Tetris
+
+//Fonction affichage du menu
+function showMenu(scene) {
+    const menuContainer = document.getElementById('menuContainer');
+    menuContainer.style.display = 'block';
+
+    console.log('Show menu');
+    const startButton = document.getElementById('startButton');
+    startButton.onclick = function() {
+        start = true;
+        backgroundMusic.play();
+        menuContainer.style.display = 'none';
+        lineSound = scene.sound.add('lineSound');
+        createNewBlock(scene);
+        drawNextPiece(scene);
+    };
+}
+
+function drawNextPiece(scene) {
+    const nextPieceCanvas = document.getElementById('nextPieceCanvas');
+    const nextPieceCtx = nextPieceCanvas.getContext('2d');
+    nextPieceCtx.clearRect(0, 0, nextPieceCanvas.width, nextPieceCanvas.height); // Efface le contenu précédent
+
+    nextBlock = generateRandomBlock();
+
+    const blockSize = nextPieceCanvas.width / 4; // Taille d'un bloc dans le canvas du prochain bloc
+
+    nextPieceCtx.fillStyle = '#FF0000'; // Couleur du bloc
+    for (let y = 0; y < nextBlock.pattern.length; y++) {
+        for (let x = 0; x < nextBlock.pattern[y].length; x++) {
+            if (nextBlock.pattern[y][x] === 1) {
+                nextPieceCtx.fillRect(x * blockSize, y * blockSize, blockSize, blockSize);
+            }
+        }
+    }
+}
+
 
 // Fonctions du jeu
 function preload() {
@@ -29,6 +68,8 @@ function preload() {
     this.load.image('stoneblock', 'img/stone_block.jpg');
     this.load.image('background', 'img/background.png');
     this.load.image('violetblock', 'img/block_violet.png');
+    this.load.audio('lineSound', 'sound/line.mp3');
+    this.load.audio('backgroundMusic', 'sound/background.mp3');
 }
 
 function create() {
@@ -58,13 +99,16 @@ function create() {
 
     // Gérer les entrées clavier
     cursors = this.input.keyboard.createCursorKeys();
-    //cursors.down.on('down', fallBlocks, this);
     cursors.left.on('down', moveBlockLeft, this);
     cursors.right.on('down', moveBlockRight, this);
     this.input.keyboard.on('keydown-R', rotateBlock, this);
 
-    // Démarrer le jeu en créant un premier bloc Tetris
-    createNewBlock(this);
+    // Charger le son de suppression de ligne
+    lineSound = this.sound.add('lineSound');
+    backgroundMusic = this.sound.add('backgroundMusic', { loop: true });
+
+    // Afficher le menu
+    showMenu(this);
 }
 
 function update() {
@@ -74,6 +118,14 @@ function update() {
     }
     // Vérifier si une ligne est pleine
     removeFullLines(mapData);
+
+    // Vérifier si le jeu est terminé
+    if (isGameOver(mapData)) {
+        console.log('Game over!');
+        this.add.text(150, 270, 'Game Over', { fontSize: '40px', fill: '#fff' }).setOrigin(0.5);
+        timer.remove(false);
+        start = false;
+    }
 }
 
 ///////////////////////////////////////////
@@ -81,7 +133,7 @@ function update() {
 
 //Fonction pour créer un nouveau bloc Tetris
 function createNewBlock(scene) {
-    activeBlock = generateRandomBlock();
+    activeBlock = nextBlock;
     placeBlockOnMap(activeBlock, mapData);
 
     // Redessiner la carte avec le bloc Tetris actif
@@ -188,16 +240,22 @@ function fallBlocksAutomatically(scene) {
         activeBlock.y++;
         placeBlockOnMap(activeBlock, mapData, 2);
         drawMap(scene, blockSize, 10, 18, mapData);
-    } else {
+    } 
+    else {
         placeBlockOnMap(activeBlock, mapData, 3);
         timer.remove(false);
         drawMap(scene, blockSize, 10, 18, mapData);
         createNewBlock(scene);
+        drawNextPiece(scene);
     }
 }
 
 // Fonction pour vérifier si un bloc peut se déplacer dans une direction donnée
 function canBlockMove(block, mapData, direction) {
+    if (!block) {
+        console.error("Active block is undefined");
+        return false;
+    }
     let newX = block.x;
     let newY = block.y;
 
@@ -288,7 +346,7 @@ function canRotateBlock(block, mapData, rotatedPattern) {
                     return false;
                 }
                 if (mapData[newY][newX] === 3 || mapData[newY][newX] === 1) {
-                    console.log('Collision avec un bloc Tetris ou une pierre');
+                    console.log('Collision avec un bloc Tetris');
                     return false;
                 }
             }
@@ -304,6 +362,7 @@ function isLineFull(line) {
             return false;
         }
     }
+    lineSound.play();
     return true;
 }
 
@@ -320,4 +379,15 @@ function removeFullLines(mapData) {
             mapData.unshift(tab);
         }
     }
+}
+
+// Fonction pour vérifier si le jeu est terminé
+function isGameOver(mapData) {
+    for (let x = 1; x < 9; x++) {
+        if (mapData[0][x] === 3) {
+            backgroundMusic.stop();
+            return true;
+        }
+    }
+    return false;
 }

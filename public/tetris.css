@@ -1,0 +1,47 @@
+#tetrisContainer {
+    position: relative; /* Changement de la position en relative pour que les éléments enfants positionnés absolument se réfèrent à ce conteneur */
+    border: 1px solid black;
+    display: block;
+    margin: 0 auto;
+    width: 300px;
+    height: 540px;
+    image-rendering: pixelated;
+}
+
+#menuContainer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    display: none;
+    z-index: 1000;
+}
+
+#startButton {
+    font-size: 24px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#startButton:hover {
+    background-color: #45a049;
+}
+
+#nextPieceContainer {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    text-align: center;
+    display: block; /* Changement de display à block pour afficher le conteneur */
+}
+
+#nextPieceCanvas {
+    width: 150px; /* Ajout de la largeur et de la hauteur au canevas */
+    height: 150px;
+    border: 1px solid black; /* Ajout d'une bordure pour le canevas */
+}

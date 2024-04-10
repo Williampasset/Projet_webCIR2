@@ -15,8 +15,16 @@ app.get('/tetris.js', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'tetris.js'));
 });
 
+// Route pour servir le fichier CSS du jeu Tetris
+app.get('/tetris.css', (req, res) =>
+    res.sendFile(path.join(__dirname, 'public', 'tetris.css'))
+);
+
 // Servir les fichiers d'images depuis le dossier 'img'
 app.use('/img', express.static(path.join(__dirname, 'public', 'img')));
+
+// Servir les fichiers de son depuis le dossier 'sound'
+app.use('/sound', express.static(path.join(__dirname, 'public', 'sound')));
 
 // Route pour gérer les requêtes non trouvées
 app.use((req, res) => {
