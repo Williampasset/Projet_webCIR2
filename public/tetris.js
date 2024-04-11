@@ -31,13 +31,13 @@ function showMenu(scene) {
     const menuContainer = document.getElementById('menuContainer');
     menuContainer.style.display = 'block';
 
-    console.log('Show menu');
     const startButton = document.getElementById('startButton');
     startButton.onclick = function() {
         start = true;
         backgroundMusic.play();
         menuContainer.style.display = 'none';
         lineSound = scene.sound.add('lineSound');
+        gameOverSound = scene.sound.add('gameOverSound');
         createNewBlock(scene);
         drawNextPiece(scene);
     };
@@ -71,6 +71,7 @@ function preload() {
     this.load.image('violetblock', 'img/block_violet.png');
     this.load.audio('lineSound', 'sound/line.mp3');
     this.load.audio('backgroundMusic', 'sound/background.mp3');
+    this.load.audio('gameOverSound', 'sound/gameOver.mp3');
 }
 
 function create() {
@@ -95,6 +96,11 @@ function create() {
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     ]
+
+
+    // Charger le leaderboard
+    fetchLeaderboard();
+
     // Dessiner la carte de fond
     drawMap(this, blockSize, 10, 18, mapData);
 
@@ -104,12 +110,15 @@ function create() {
     cursors.right.on('down', moveBlockRight, this);
     this.input.keyboard.on('keydown-R', rotateBlock, this);
 
-    // Charger le son de suppression de ligne
-    lineSound = this.sound.add('lineSound');
+    // Charger les sons
     backgroundMusic = this.sound.add('backgroundMusic', { loop: true });
 
     // Afficher le menu
     showMenu(this);
+    const restartButton = document.getElementById('restartButton');
+    restartButton.onclick = function() {
+        window.location.reload();
+    };
 }
 
 function update() {
@@ -121,11 +130,32 @@ function update() {
     removeFullLines(mapData);
 
     // Vérifier si le jeu est terminé
-    if (isGameOver(mapData)) {
-        console.log('Game over!');
+    if (isGameOver(mapData) && start) {
         this.add.text(150, 270, 'Game Over', { fontSize: '40px', fill: '#fff' }).setOrigin(0.5);
         timer.remove(false);
         start = false;
+        gameOverSound.play();
+
+        // Lorsque le joueur perd la partie, affichez une boîte de dialogue pour saisir le pseudo
+        const playerName = prompt("Enter your name:");
+
+        fetch('/leaderboard', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ pseudo: playerName, score: scoreUser }),
+        })
+        .then(response => {
+            if (!response.ok) {
+            throw new Error('Failed to update leaderboard');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de la mise à jour du leaderboard :', error.message);
+        });
+
+
     }
 }
 
@@ -224,7 +254,7 @@ function drawMap(scene, tileSize, mapWidth, mapHeight, mapData) {
 
 // Fonction pour faire tomber un bloc manuellement
 function fallBlocks(scene) {
-    if (canBlockMove(activeBlock, mapData, 'down')) {
+    if (start && canBlockMove(activeBlock, mapData, 'down')) {
         clearBlockFromMap(activeBlock, mapData);
         activeBlock.y++;
         placeBlockOnMap(activeBlock, mapData,2);
@@ -235,9 +265,7 @@ function fallBlocks(scene) {
 
 // Fonction pour faire tomber un bloc automatiquement
 function fallBlocksAutomatically(scene) {
-    if (canBlockMove(activeBlock, mapData, 'down')) {
-        console.log(activeBlock);
-        console.log('Block can move down');
+    if (start && canBlockMove(activeBlock, mapData, 'down')) {
         clearBlockFromMap(activeBlock, mapData);
         activeBlock.y++;
         placeBlockOnMap(activeBlock, mapData, 2);
@@ -256,7 +284,6 @@ function fallBlocksAutomatically(scene) {
 // Fonction pour vérifier si un bloc peut se déplacer dans une direction donnée
 function canBlockMove(block, mapData, direction) {
     if (!block) {
-        console.error("Active block is undefined");
         return false;
     }
     let newX = block.x;
@@ -292,12 +319,12 @@ function canBlockMove(block, mapData, direction) {
         }
     }
 
-    return true; // Déplacement autorisé
+    return true;
 }
 
 // Fonction de déplacement du bloc vers la gauche
 function moveBlockLeft() {
-    if (canBlockMove(activeBlock, mapData, 'left')) {
+    if (start && canBlockMove(activeBlock, mapData, 'left')) {
         clearBlockFromMap(activeBlock, mapData);
         activeBlock.x--;
         placeBlockOnMap(activeBlock, mapData, 2);
@@ -307,7 +334,7 @@ function moveBlockLeft() {
 
 // Fonction de déplacement du bloc vers la droite
 function moveBlockRight() {
-    if (canBlockMove(activeBlock, mapData, 'right')) {
+    if (start && canBlockMove(activeBlock, mapData, 'right')) {
         clearBlockFromMap(activeBlock, mapData);
         activeBlock.x++;
         placeBlockOnMap(activeBlock, mapData, 2);
@@ -326,7 +353,7 @@ function rotateBlock() {
     }
 
     // Vérifier si la rotation est autorisée
-    if (canRotateBlock(activeBlock, mapData, rotatedPattern)) {
+    if (start && canRotateBlock(activeBlock, mapData, rotatedPattern)) {
         clearBlockFromMap(activeBlock, mapData);
         activeBlock.pattern = rotatedPattern;
         placeBlockOnMap(activeBlock, mapData, 2);
@@ -391,6 +418,8 @@ function isGameOver(mapData) {
     for (let x = 1; x < 9; x++) {
         if (mapData[0][x] === 3) {
             backgroundMusic.stop();
+            const restartContainer = document.getElementById('restartButton');
+            restartContainer.style.display = 'block';
             return true;
         }
     }
@@ -400,6 +429,49 @@ function isGameOver(mapData) {
 // Fonction calcul du score
 function calculateScore(addToScore){
     scoreUser += addToScore;
-    document.getElementById('userScore').innerHTML = scoreUser;
-    console.log(scoreUser);
+    const userScoreElement = document.getElementById('userScore');
+    if (userScoreElement) {
+        userScoreElement.innerHTML = scoreUser;
+    } else {
+        console.error("L'élément userScore n'existe pas dans le DOM.");
+    }
+
+}
+
+// Fonction pour récupérer les scores des joueurs depuis le serveur
+function fetchLeaderboard() {
+    fetch('/leaderboard')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch leaderboard');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Traitez les données du leaderboard ici
+            updateLeaderboard(data); // Supposons que vous avez une fonction pour mettre à jour l'affichage du leaderboard
+        })
+        .catch(error => {
+            console.error('Erreur lors de la récupération du leaderboard :', error.message);
+        });
+}
+
+
+// Fonction pour mettre à jour l'affichage du leaderboard
+function updateLeaderboard(leaderboardData) {
+    const leaderboardContainer = document.getElementById('leaderboard');
+    leaderboardContainer.innerHTML = ''; // Efface le contenu précédent du conteneur de leaderboard
+
+    // Triez les données du leaderboard par score (du plus élevé au plus bas)
+    leaderboardData.sort((a, b) => b.score - a.score);
+
+    // Limitez le nombre de joueurs à afficher à 10
+    const playersToShow = leaderboardData.slice(0, 10);
+
+    // Parcourez les données des joueurs à afficher et ajoutez-les au conteneur de leaderboard
+    playersToShow.forEach(player => {
+        const playerEntry = document.createElement('div');
+        playerEntry.textContent = `${player.pseudo}: ${player.score}`;
+        leaderboardContainer.appendChild(playerEntry);
+    });
 }

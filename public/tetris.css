@@ -1,20 +1,17 @@
-*{
+* {
     font-family: Arial Narrow, sans-serif;
     font-weight: bold;
 }
 
-body{
-    background-image:url('/img/pageBackground.jpg');
+body {
+    background-image: url('/img/pageBackground.jpg');
     background-size: contain;
-}
-/* Styles for heading */
-h1 {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    font-size: 50px;
-    text-align: center;
-    color: #52FFEB;
+    margin: 0;
+    padding: 0;
+    display: flex; /* Utilisation de flexbox pour centrer le contenu */
+    justify-content: center; /* Centrer horizontalement */
+    align-items: center; /* Centrer verticalement */
+    height: 100vh; /* Hauteur de la fenêtre */
 }
 
 /* Container for Tetris game */
@@ -22,11 +19,13 @@ h1 {
     position: relative;
     border: 2px solid #333;
     display: block;
-    margin: 0 auto;
     width: 300px;
     height: 540px;
+    margin-right: 20px; /* Écart à droite de la prochaine pièce */
+    margin-left: 20px; /* Ajout de marge à gauche */
     image-rendering: pixelated;
 }
+
 
 /* Container for menu */
 #menuContainer {
@@ -35,8 +34,8 @@ h1 {
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
-    display: none;
     z-index: 1000;
+    width: 100%; /* Assurer que le conteneur occupe toute la largeur de #tetrisContainer */
 }
 
 /* Start button */
@@ -54,13 +53,29 @@ h1 {
     background-color: #45a049;
 }
 
+/* Start button */
+#restartButton {
+    font-size: 24px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: none;
+
+}
+#restartButton:hover {
+    background-color: #45a049;
+}
 /* Container for next piece */
 #nextPieceContainer {
-    position: absolute;
-    top: 20px;
-    right: 20px;
+    position: relative;
+    top: 0;
+    left: 20px;
     text-align: center;
-    display: block;
+    margin-bottom: 20px;
+    color: white;
 }
 
 /* Canvas for next piece */
@@ -73,6 +88,117 @@ h1 {
 }
 
 /* Container for score */
-#userScore{
-    
+#score {
+    position: absolute;
+    top: 0; /* Réajustement de la position */
+    left: 20px; /* Écart à gauche du Tetris */
+    color: white;
+    font-size: 24px;
+}
+* {
+    font-family: Arial Narrow, sans-serif;
+    font-weight: bold;
+}
+
+body {
+    background-image: url('/img/pageBackground.jpg');
+    background-size: contain;
+    margin: 0;
+    padding: 0;
+    display: flex; /* Utilisation de flexbox pour centrer le contenu */
+    justify-content: center; /* Centrer horizontalement */
+    align-items: center; /* Centrer verticalement */
+    height: 100vh; /* Hauteur de la fenêtre */
+}
+
+/* Container for Tetris game */
+#tetrisContainer {
+    position: relative;
+    border: 2px solid #333;
+    display: block;
+    width: 300px;
+    height: 540px;
+    margin-right: 20px; /* Écart à droite de la prochaine pièce */
+    margin-left: 20px; /* Ajout de marge à gauche */
+    image-rendering: pixelated;
+}
+
+
+/* Container for menu */
+#menuContainer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 1000;
+    width: 100%; /* Assurer que le conteneur occupe toute la largeur de #tetrisContainer */
+}
+
+/* Start button */
+#startButton {
+    font-size: 24px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#startButton:hover {
+    background-color: #45a049;
+}
+
+/* Start button */
+#restartButton {
+    font-size: 24px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: none;
+
+}
+#restartButton:hover {
+    background-color: #45a049;
+}
+/* Container for next piece */
+#nextPieceContainer {
+    position: relative;
+    top: 0;
+    left: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    color: white;
+}
+
+/* Canvas for next piece */
+#nextPieceCanvas {
+    width: 120px;
+    height: 120px;
+    border: 2px solid #333;
+    background-color: #69807D;
+    image-rendering: pixelated;
+}
+
+/* Container for score */
+#score {
+    position: absolute;
+    top: 0; /* Réajustement de la position */
+    left: 20px; /* Écart à gauche du Tetris */
+    color: white;
+    font-size: 24px;
+}
+
+/* Style pour la section des commandes de jeu */
+#controls {
+    background-color: #69807D;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 20px;
+    width: 200px;
 }

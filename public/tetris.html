@@ -10,17 +10,29 @@
 </head>
 <body>
     <div id="score">
-        <h2>Score:</h2> 
-        <div id="userScore"></div>
+        <h2>Score:</h2><div id="userScore"></div>
+        <h2>Leaderboard:</h2>
+        <div id="leaderboard"></div>
     </div>
-    <div id="menuContainer">
-        <button id="startButton">Start Game</button>
+    <div id="tetrisContainer">
+        <div id="menuContainer">
+            <button id="startButton">Start Game</button>
+            <button id="restartButton">Restart Game</button>
+        </div>
     </div>
     <div id="nextPieceContainer">
         <div>Next Piece:</div>
         <canvas id="nextPieceCanvas" width="120" height="120"></canvas>
+        <div id="controls">
+            <h2>Controls</h2>
+            <p>Left: Move Left</p>
+            <p>Right: Move Right</p>
+            <p>Down: Move Down</p>
+            <p>Space: Rotate</p>
+            <p>P: Pause</p>
+        </div>
     </div>
-    <div id="tetrisContainer"></div>
+    
     <!-- Chargement du script JavaScript pour le jeu Tetris -->
     <script src="tetris.js"></script>
 </body>
