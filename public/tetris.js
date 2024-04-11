@@ -23,6 +23,7 @@ let timer;
 let FALL_DELAY = 1000; // Délai entre les chutes automatiques des blocs (en millisecondes)
 let start = false;
 let nextBlock = generateRandomBlock();
+let scoreUser = 0;
 //0: vide, 1: bloc de pierre, 2: bloc Tetris
 
 //Fonction affichage du menu
@@ -51,7 +52,7 @@ function drawNextPiece(scene) {
 
     const blockSize = nextPieceCanvas.width / 4; // Taille d'un bloc dans le canvas du prochain bloc
 
-    nextPieceCtx.fillStyle = '#FF0000'; // Couleur du bloc
+    nextPieceCtx.fillStyle = '#FFDC52'; // Couleur du bloc
     for (let y = 0; y < nextBlock.pattern.length; y++) {
         for (let x = 0; x < nextBlock.pattern[y].length; x++) {
             if (nextBlock.pattern[y][x] === 1) {
@@ -228,6 +229,7 @@ function fallBlocks(scene) {
         activeBlock.y++;
         placeBlockOnMap(activeBlock, mapData,2);
         drawMap(scene, blockSize, 10, 18, mapData);
+        calculateScore(10);
     }
 }
 
@@ -240,6 +242,7 @@ function fallBlocksAutomatically(scene) {
         activeBlock.y++;
         placeBlockOnMap(activeBlock, mapData, 2);
         drawMap(scene, blockSize, 10, 18, mapData);
+        calculateScore(10);
     } 
     else {
         placeBlockOnMap(activeBlock, mapData, 3);
@@ -347,6 +350,7 @@ function canRotateBlock(block, mapData, rotatedPattern) {
                 }
                 if (mapData[newY][newX] === 3 || mapData[newY][newX] === 1) {
                     console.log('Collision avec un bloc Tetris');
+                    calculateScore(20);
                     return false;
                 }
             }
@@ -362,7 +366,6 @@ function isLineFull(line) {
             return false;
         }
     }
-    lineSound.play();
     return true;
 }
 
@@ -370,6 +373,8 @@ function isLineFull(line) {
 function removeFullLines(mapData) {
     for (let y = 0; y < mapData.length; y++) {
         if (isLineFull(mapData[y])) {
+            lineSound.play();
+            calculateScore(100);
             // Supprimer la ligne pleine
             mapData.splice(y, 1);
             // Ajouter une nouvelle ligne vide au début de la carte
@@ -390,4 +395,11 @@ function isGameOver(mapData) {
         }
     }
     return false;
+}
+
+// Fonction calcul du score
+function calculateScore(addToScore){
+    scoreUser += addToScore;
+    document.getElementById('userScore').innerHTML = scoreUser;
+    console.log(scoreUser);
 }

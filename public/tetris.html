@@ -5,14 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
     <link href="tetris.css" rel="stylesheet" />
+    <link rel="icon" type="image/x-icon" href="/img/tetris_logo.png">
     <title>Tetris</title>
 </head>
 <body>
+    <div id="score">
+        <h2>Score:</h2> 
+        <div id="userScore"></div>
+    </div>
     <div id="menuContainer">
         <button id="startButton">Start Game</button>
     </div>
     <div id="nextPieceContainer">
-        <canvas id="nextPieceCanvas" width="150" height="150"></canvas>
+        <div>Next Piece:</div>
+        <canvas id="nextPieceCanvas" width="120" height="120"></canvas>
     </div>
     <div id="tetrisContainer"></div>
     <!-- Chargement du script JavaScript pour le jeu Tetris -->

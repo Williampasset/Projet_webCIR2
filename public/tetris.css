@@ -1,6 +1,26 @@
+*{
+    font-family: Arial Narrow, sans-serif;
+    font-weight: bold;
+}
+
+body{
+    background-image:url('/img/pageBackground.jpg');
+    background-size: contain;
+}
+/* Styles for heading */
+h1 {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 50px;
+    text-align: center;
+    color: #52FFEB;
+}
+
+/* Container for Tetris game */
 #tetrisContainer {
-    position: relative; /* Changement de la position en relative pour que les éléments enfants positionnés absolument se réfèrent à ce conteneur */
-    border: 1px solid black;
+    position: relative;
+    border: 2px solid #333;
     display: block;
     margin: 0 auto;
     width: 300px;
@@ -8,6 +28,7 @@
     image-rendering: pixelated;
 }
 
+/* Container for menu */
 #menuContainer {
     position: absolute;
     top: 50%;
@@ -18,6 +39,7 @@
     z-index: 1000;
 }
 
+/* Start button */
 #startButton {
     font-size: 24px;
     padding: 10px 20px;
@@ -32,16 +54,25 @@
     background-color: #45a049;
 }
 
+/* Container for next piece */
 #nextPieceContainer {
     position: absolute;
     top: 20px;
     right: 20px;
     text-align: center;
-    display: block; /* Changement de display à block pour afficher le conteneur */
+    display: block;
 }
 
+/* Canvas for next piece */
 #nextPieceCanvas {
-    width: 150px; /* Ajout de la largeur et de la hauteur au canevas */
-    height: 150px;
-    border: 1px solid black; /* Ajout d'une bordure pour le canevas */
+    width: 120px;
+    height: 120px;
+    border: 2px solid #333;
+    background-color: #69807D;
+    image-rendering: pixelated;
+}
+
+/* Container for score */
+#userScore{
+    
 }
