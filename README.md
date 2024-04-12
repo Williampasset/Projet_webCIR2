@@ -5,6 +5,7 @@ Création d'un Tetris en javascript à l'aide de Phaser.js
 
 - [Fonctionnalités](#fonctionnalités)
 - [Pistes d'améliorations](#pistesd'améliorations)
+- [Bilan du projet](#bilan-du-projet)
 - [Réalisation](#réalisation)
 
 ## Fonctionnalités
