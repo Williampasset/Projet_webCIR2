@@ -24,10 +24,20 @@ let FALL_DELAY = 1000; // Délai entre les chutes automatiques des blocs (en mil
 let start = false;
 let nextBlock = generateRandomBlock();
 let scoreUser = 0;
-//0: vide, 1: bloc de pierre, 2: bloc Tetris
+const blockColors = {
+    line: '#1fa5af',
+    square: '#afbd0e',
+    L: '#6b3bed',
+    T: '#b76e0f',
+    Z: '#b81111',
+    S: '#07c747',
+    J: '#2e05e8'
+};
+//0: fond, 1: bloc laser, 2: bloc Tetris en mouvement, 3: bloc Tetris fixé, 4: bloc laser
 
 //Fonction affichage du menu
 function showMenu(scene) {
+
     const menuContainer = document.getElementById('menuContainer');
     menuContainer.style.display = 'block';
 
@@ -52,7 +62,7 @@ function drawNextPiece(scene) {
 
     const blockSize = nextPieceCanvas.width / 4; // Taille d'un bloc dans le canvas du prochain bloc
 
-    nextPieceCtx.fillStyle = '#FFDC52'; // Couleur du bloc
+    nextPieceCtx.fillStyle = blockColors[nextBlock.type]; // Couleur du bloc
     for (let y = 0; y < nextBlock.pattern.length; y++) {
         for (let x = 0; x < nextBlock.pattern[y].length; x++) {
             if (nextBlock.pattern[y][x] === 1) {
@@ -66,9 +76,16 @@ function drawNextPiece(scene) {
 // Fonctions du jeu
 function preload() {
     // Chargement des ressources du jeu (images, etc.)
-    this.load.image('stoneblock', 'img/stone_block.jpg');
+    this.load.image('line', 'img/line.png');
+    this.load.image('square', 'img/square.png');
+    this.load.image('L', 'img/L.png');
+    this.load.image('T', 'img/T.png');
+    this.load.image('Z', 'img/Z.png');
+    this.load.image('S', 'img/S.png');
+    this.load.image('J', 'img/J.png');
+    this.load.image('laserblock', 'img/laserblock.jpg');
     this.load.image('background', 'img/background.png');
-    this.load.image('violetblock', 'img/block_violet.png');
+    this.load.image('secondlaser', 'img/laser2block.jpg')
     this.load.audio('lineSound', 'sound/line.mp3');
     this.load.audio('backgroundMusic', 'sound/background.mp3');
     this.load.audio('gameOverSound', 'sound/gameOver.mp3');
@@ -94,7 +111,7 @@ function create() {
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        [1, 4, 4, 4, 4, 4, 4, 4, 4, 1]
     ]
 
 
@@ -102,7 +119,7 @@ function create() {
     fetchLeaderboard();
 
     // Dessiner la carte de fond
-    drawMap(this, blockSize, 10, 18, mapData);
+    drawMap(this, blockSize, 10, 18, mapData, activeBlock);
 
     // Gérer les entrées clavier
     cursors = this.input.keyboard.createCursorKeys();
@@ -131,13 +148,13 @@ function update() {
 
     // Vérifier si le jeu est terminé
     if (isGameOver(mapData) && start) {
-        this.add.text(150, 270, 'Game Over', { fontSize: '40px', fill: '#fff' }).setOrigin(0.5);
+        this.add.text(150, 210, 'Game Over', { fontSize: '40px', fill: '#fff' }).setOrigin(0.5);
         timer.remove(false);
         start = false;
         gameOverSound.play();
 
         // Lorsque le joueur perd la partie, affichez une boîte de dialogue pour saisir le pseudo
-        const playerName = prompt("Enter your name:");
+        const playerName = prompt("Enter your name:") || "Anonyme";
 
         fetch('/leaderboard', {
             method: 'POST',
@@ -168,7 +185,7 @@ function createNewBlock(scene) {
     placeBlockOnMap(activeBlock, mapData);
 
     // Redessiner la carte avec le bloc Tetris actif
-    drawMap(scene, blockSize, 10, 18, mapData);
+    drawMap(scene, blockSize, 10, 18, mapData, activeBlock);
 
     // Démarrer le timer pour la chute automatique des blocs
     timer = scene.time.addEvent({
@@ -222,7 +239,7 @@ function clearBlockFromMap(block, mapData) {
 }
 
 // Fonction pour dessiner la carte de jeu
-function drawMap(scene, tileSize, mapWidth, mapHeight, mapData) {
+function drawMap(scene, tileSize, mapWidth, mapHeight, mapData, activeBlock) {
     // Dessiner chaque tuile de la carte
     for (let y = 0; y < mapHeight; y++) {
         for (let x = 0; x < mapWidth; x++) {
@@ -236,13 +253,16 @@ function drawMap(scene, tileSize, mapWidth, mapHeight, mapData) {
                     scene.add.image(tileX, tileY, 'background').setOrigin(0.5);
                     break;
                 case 1:
-                    scene.add.image(tileX, tileY, 'stoneblock').setOrigin(0.5);
+                    scene.add.image(tileX, tileY, 'laserblock').setOrigin(0.5);
                     break;
                 case 2:
-                    scene.add.image(tileX, tileY, 'violetblock').setOrigin(0.5);
+                    scene.add.image(tileX, tileY, `${activeBlock.type}`).setOrigin(0.5);
                     break;
                 case 3:
-                    scene.add.image(tileX, tileY, 'violetblock').setOrigin(0.5);
+                    scene.add.image(tileX, tileY, `${activeBlock.type}`).setOrigin(0.5);
+                    break;
+                case 4:
+                    scene.add.image(tileX, tileY, 'secondlaser').setOrigin(0.5);
                     break;
             }
         }
@@ -258,7 +278,7 @@ function fallBlocks(scene) {
         clearBlockFromMap(activeBlock, mapData);
         activeBlock.y++;
         placeBlockOnMap(activeBlock, mapData,2);
-        drawMap(scene, blockSize, 10, 18, mapData);
+        drawMap(scene, blockSize, 10, 18, mapData, activeBlock);
         calculateScore(10);
     }
 }
@@ -269,13 +289,13 @@ function fallBlocksAutomatically(scene) {
         clearBlockFromMap(activeBlock, mapData);
         activeBlock.y++;
         placeBlockOnMap(activeBlock, mapData, 2);
-        drawMap(scene, blockSize, 10, 18, mapData);
+        drawMap(scene, blockSize, 10, 18, mapData, activeBlock);
         calculateScore(10);
     } 
     else {
         placeBlockOnMap(activeBlock, mapData, 3);
         timer.remove(false);
-        drawMap(scene, blockSize, 10, 18, mapData);
+        drawMap(scene, blockSize, 10, 18, mapData, activeBlock);
         createNewBlock(scene);
         drawNextPiece(scene);
     }
@@ -328,7 +348,7 @@ function moveBlockLeft() {
         clearBlockFromMap(activeBlock, mapData);
         activeBlock.x--;
         placeBlockOnMap(activeBlock, mapData, 2);
-        drawMap(this, blockSize, 10, 18, mapData);
+        drawMap(this, blockSize, 10, 18, mapData, activeBlock);
     }
 }
 
@@ -338,7 +358,7 @@ function moveBlockRight() {
         clearBlockFromMap(activeBlock, mapData);
         activeBlock.x++;
         placeBlockOnMap(activeBlock, mapData, 2);
-        drawMap(this, blockSize, 10, 18, mapData);
+        drawMap(this, blockSize, 10, 18, mapData, activeBlock);
     }
 }
 
@@ -357,7 +377,7 @@ function rotateBlock() {
         clearBlockFromMap(activeBlock, mapData);
         activeBlock.pattern = rotatedPattern;
         placeBlockOnMap(activeBlock, mapData, 2);
-        drawMap(this, blockSize, 10, 18, mapData);
+        drawMap(this, blockSize, 10, 18, mapData, activeBlock);
     }
 }
 
@@ -419,7 +439,11 @@ function isGameOver(mapData) {
         if (mapData[0][x] === 3) {
             backgroundMusic.stop();
             const restartContainer = document.getElementById('restartButton');
+            const startButton = document.getElementById('startButton');
+            const menuContainer = document.getElementById('menuContainer');
             restartContainer.style.display = 'block';
+            startButton.style.display = 'none';
+            menuContainer.style.display = 'block';
             return true;
         }
     }
@@ -459,7 +483,7 @@ function fetchLeaderboard() {
 
 // Fonction pour mettre à jour l'affichage du leaderboard
 function updateLeaderboard(leaderboardData) {
-    const leaderboardContainer = document.getElementById('leaderboard');
+    const leaderboardContainer = document.getElementById('leaderboardList');
     leaderboardContainer.innerHTML = ''; // Efface le contenu précédent du conteneur de leaderboard
 
     // Triez les données du leaderboard par score (du plus élevé au plus bas)
