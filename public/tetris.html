@@ -10,6 +10,7 @@
     <title>Tetris</title>
 </head>
 <body>
+    <!-- Score et leaderboard -->
     <div id="score">
         <h2>Score:</h2><div id="userScore"></div>
         <div id="leaderboard" class="container">
@@ -17,12 +18,16 @@
             <div id="leaderboardList" class="container"></div>
         </div>
     </div>
+
+    <!-- Canvas pour le jeu Tetris -->
     <div id="tetrisContainer" >
         <div id="menuContainer" class="container">
             <button id="startButton" class="btn-lg ">Start</button>
             <button id="restartButton" class="btn-lg ">Restart</button>
         </div>
     </div>
+
+    <!-- Canvas pour le prochain bloc -->
     <div id="nextPieceContainer">
         <div>Next Piece:</div>
         <canvas id="nextPieceCanvas" width="120" height="120"></canvas>

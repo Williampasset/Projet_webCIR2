@@ -15,15 +15,17 @@ const config = {
 const game = new Phaser.Game(config);
 
 // Variables globales pour le jeu
-let blockSize = 30;
+let blockSize = 30;// Taille d'un bloc en pixels
 let cursors;
-let mapData;
-let activeBlock;
+let mapData;// Données de la carte de jeu
+let activeBlock;// Bloc Tetris actif
 let timer;
 let FALL_DELAY = 1000; // Délai entre les chutes automatiques des blocs (en millisecondes)
-let start = false;
-let nextBlock = generateRandomBlock();
-let scoreUser = 0;
+let start = false;// Démarrage du jeu
+let nextBlock = generateRandomBlock();// Bloc Tetris suivant
+let scoreUser = 0;// Score du joueur
+
+// Couleurs des blocs Tetris pour le nextPieceCanvas
 const blockColors = {
     line: '#1fa5af',
     square: '#afbd0e',
@@ -33,14 +35,18 @@ const blockColors = {
     S: '#07c747',
     J: '#2e05e8'
 };
+//Définition des types de blocs Tetris sur la map:
 //0: fond, 1: bloc laser, 2: bloc Tetris en mouvement, 3: bloc Tetris fixé, 4: bloc laser
+
 
 //Fonction affichage du menu
 function showMenu(scene) {
 
+    // Afficher le menu de démarrage
     const menuContainer = document.getElementById('menuContainer');
     menuContainer.style.display = 'block';
 
+    // Gérer le clic sur le bouton de démarrage
     const startButton = document.getElementById('startButton');
     startButton.onclick = function() {
         start = true;
@@ -53,16 +59,21 @@ function showMenu(scene) {
     };
 }
 
+//Fonction pour dessiner le prochain bloc Tetris
 function drawNextPiece(scene) {
+
+    // Dessiner le prochain bloc Tetris dans le canvas nextPieceCanvas
     const nextPieceCanvas = document.getElementById('nextPieceCanvas');
     const nextPieceCtx = nextPieceCanvas.getContext('2d');
-    nextPieceCtx.clearRect(0, 0, nextPieceCanvas.width, nextPieceCanvas.height); // Efface le contenu précédent
+    // Efface le contenu précédent du canvas
+    nextPieceCtx.clearRect(0, 0, nextPieceCanvas.width, nextPieceCanvas.height);
 
     nextBlock = generateRandomBlock();
 
-    const blockSize = nextPieceCanvas.width / 4; // Taille d'un bloc dans le canvas du prochain bloc
+    const blockSize = nextPieceCanvas.width / 4;
 
-    nextPieceCtx.fillStyle = blockColors[nextBlock.type]; // Couleur du bloc
+    // Dessiner le bloc Tetris suivant dans le canevas nextPieceCanvas
+    nextPieceCtx.fillStyle = blockColors[nextBlock.type];
     for (let y = 0; y < nextBlock.pattern.length; y++) {
         for (let x = 0; x < nextBlock.pattern[y].length; x++) {
             if (nextBlock.pattern[y][x] === 1) {
@@ -75,7 +86,7 @@ function drawNextPiece(scene) {
 
 // Fonctions du jeu
 function preload() {
-    // Chargement des ressources du jeu (images, etc.)
+    // Chargement des ressources du jeu (images et sons)
     this.load.image('line', 'img/line.png');
     this.load.image('square', 'img/square.png');
     this.load.image('L', 'img/L.png');
@@ -93,6 +104,8 @@ function preload() {
 
 function create() {
     // Initialisation du jeu
+
+    // Initialiser la map
     mapData = [
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -143,6 +156,7 @@ function update() {
     if(cursors.down.isDown){
         fallBlocks(this);
     }
+
     // Vérifier si une ligne est pleine
     removeFullLines(mapData);
 
@@ -156,6 +170,7 @@ function update() {
         // Lorsque le joueur perd la partie, affichez une boîte de dialogue pour saisir le pseudo
         const playerName = prompt("Enter your name:") || "Anonyme";
 
+        // Enregistrez le score du joueur dans le leaderboard
         fetch('/leaderboard', {
             method: 'POST',
             headers: {
@@ -197,6 +212,8 @@ function createNewBlock(scene) {
 
 // Fonction pour générer un bloc Tetris aléatoire
 function generateRandomBlock() {
+
+    // Types de blocs Tetris
     const blockTypes = ['line', 'square', 'L', 'T', 'Z', 'S', 'J'];
     const randomBlockType = blockTypes[Math.floor(Math.random() * blockTypes.length)];
     const blockPatterns = {
@@ -208,10 +225,12 @@ function generateRandomBlock() {
         S: [[0, 1, 1], [1, 1, 0]],
         J: [[0, 1], [0, 1], [1, 1]]
     };
+    // Retourner un objet bloc Tetris
     return {
         type: randomBlockType,
         pattern: blockPatterns[randomBlockType],
-        x: Math.floor(10 / 2) - Math.floor(blockPatterns[randomBlockType][0].length / 2), // Centrer le bloc
+        // Centrer le bloc sur la carte
+        x: Math.floor(10 / 2) - Math.floor(blockPatterns[randomBlockType][0].length / 2),
         y: 0
     };
 }
@@ -292,6 +311,7 @@ function fallBlocksAutomatically(scene) {
         drawMap(scene, blockSize, 10, 18, mapData, activeBlock);
         calculateScore(10);
     } 
+    // Si le bloc ne peut pas descendre plus bas
     else {
         placeBlockOnMap(activeBlock, mapData, 3);
         timer.remove(false);
@@ -309,6 +329,7 @@ function canBlockMove(block, mapData, direction) {
     let newX = block.x;
     let newY = block.y;
 
+    // Calculer les nouvelles coordonnées du bloc
     switch (direction) {
         case 'left':
             newX--;
@@ -403,7 +424,7 @@ function canRotateBlock(block, mapData, rotatedPattern) {
             }
         }
     }
-    return true; // Rotation autorisée
+    return true;
 }
 
 // Fonction pour vérifier si une ligne est pleine
@@ -437,7 +458,11 @@ function removeFullLines(mapData) {
 function isGameOver(mapData) {
     for (let x = 1; x < 9; x++) {
         if (mapData[0][x] === 3) {
+
+            // Arrêter la musique de fond
             backgroundMusic.stop();
+
+            // Afficher le menu de fin de partie
             const restartContainer = document.getElementById('restartButton');
             const startButton = document.getElementById('startButton');
             const menuContainer = document.getElementById('menuContainer');
@@ -452,6 +477,8 @@ function isGameOver(mapData) {
 
 // Fonction calcul du score
 function calculateScore(addToScore){
+
+    // Mettre à jour le score du joueur
     scoreUser += addToScore;
     const userScoreElement = document.getElementById('userScore');
     if (userScoreElement) {
@@ -473,7 +500,7 @@ function fetchLeaderboard() {
         })
         .then(data => {
             // Traitez les données du leaderboard ici
-            updateLeaderboard(data); // Supposons que vous avez une fonction pour mettre à jour l'affichage du leaderboard
+            updateLeaderboard(data);
         })
         .catch(error => {
             console.error('Erreur lors de la récupération du leaderboard :', error.message);

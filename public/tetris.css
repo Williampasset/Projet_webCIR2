@@ -9,10 +9,10 @@ body {
     background-repeat: no-repeat;
     margin: 0;
     padding: 0;
-    display: flex; /* Utilisation de flexbox pour centrer le contenu */
-    justify-content: center; /* Centrer horizontalement */
-    align-items: center; /* Centrer verticalement */
-    height: 100vh; /* Hauteur de la fenêtre */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
 /* Container for Tetris game */
@@ -30,12 +30,12 @@ body {
 /* Container for menu */
 #menuContainer {
     position: absolute;
-    top: 50%; /* Positionner le haut à 50% de la fenêtre */
-    left: 50%; /* Positionner la gauche à 50% de la fenêtre */
-    transform: translate(-50%, -50%); /* Centrer le conteneur */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     text-align: center;
     z-index: 1000;
-    width: 100%; /* Assurer que le conteneur occupe toute la largeur de #tetrisContainer */
+    width: 100%;
 }
 
 /* Start button */
@@ -54,6 +54,7 @@ body {
     display: none;
     margin:auto;
 }
+
 /* Container for next piece */
 #nextPieceContainer {
     position: relative;
@@ -77,12 +78,13 @@ body {
 /* Container for score */
 #score {
     position: absolute;
-    top: 0; /* Réajustement de la position */
-    left: 20px; /* Écart à gauche du Tetris */
+    top: 0;
+    left: 20px;
     color: white;
     font-size: 24px;
 }
 
+/* Container for controls panel */
 #controls{
     color: white;
     font-size: 24px;
@@ -92,6 +94,7 @@ body {
     padding: 5px;
 }
 
+/* Container for leaderboard panel */
 #leaderboard{
     color: white;
     font-size: 24px;
